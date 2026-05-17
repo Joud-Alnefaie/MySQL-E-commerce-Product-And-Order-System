@@ -1,0 +1,203 @@
+-- Create a product table
+CREATE TABLE Products (
+  ProductID INT PRIMARY KEY AUTO_INCREMENT,  -- Used to automate redundant ID insertions taking unnecessary space
+  Name TEXT NOT NULL,
+  Description TEXT ,
+  Price DOUBLE NOT NULL,
+  StockQuantity INT NOT NULL,
+  Category TEXT
+);
+
+-- Create a Customer table
+CREATE TABLE Customers (
+  CustomerID INT PRIMARY KEY AUTO_INCREMENT ,  -- Used to automate redundant ID insertions taking unnecessary space
+  Name TEXT NOT NULL ,
+  Email TEXT NOT NULL ,
+  Phone INT NOT NULL,
+  Address TEXT NOT NULL
+);
+
+-- Create an Orders table
+CREATE TABLE Orders (
+  OrderID INT PRIMARY KEY AUTO_INCREMENT,  -- Used to automate redundant ID insertions taking unnecessary space
+  OrderDate DATE NOT NULL,
+  TotalAmount DOUBLE NULL,
+  CustomerID INT NOT NULL, FOREIGN KEY(CustomerID) REFERENCES Customers(CustomerID)
+);
+
+-- Create an OrderItems table
+CREATE TABLE OrderItems (
+  OrderItemID INTEGER PRIMARY KEY AUTO_INCREMENT,  -- Used to automate redundant ID insertions taking unnecessary space
+  Quantity INTEGER NOT NULL,
+  UnitPrice FLOAT NOT NULL,
+  ProductID INTEGER NOT NULL, FOREIGN KEY(ProductID) REFERENCES Products(ProductID),
+  OrderID INTEGER NOT NULL, FOREIGN KEY(OrderID) REFERENCES Orders(OrderID)
+);
+
+-- Create a Payments  table
+CREATE TABLE Payments (
+  PaymentID INTEGER PRIMARY KEY AUTO_INCREMENT,  -- Used to automate redundant ID insertions taking unnecessary space
+  PaymentDate DATE NOT NULL,
+  PaymentMethod TEXT NOT NULL,
+  PaymentStatus TEXT NOT NULL,
+  OrderID INTEGER NOT NULL, FOREIGN KEY(OrderID) REFERENCES Orders(OrderID)
+);
+
+
+-- Create a Shipments  table
+CREATE TABLE Shipments (
+  ShipmentID INTEGER PRIMARY KEY AUTO_INCREMENT,  -- Used to automate redundant ID insertions taking unnecessary space
+  ShipmentDate DATE NOT NULL,
+  ShippingAddress TEXT NOT NULL,
+  ShippingStatus TEXT NOT NULL,
+  OrderID INTEGER NOT NULL, FOREIGN KEY(OrderID) REFERENCES Orders(OrderID)
+);
+
+-- Insert into Products table
+INSERT INTO Products ( Name , Description , Price , StockQuantity , Category)
+VALUES ( 'Sony PlayStation 5' , 'Game console, supports HDR 4K/8K resolution' , 1670 , 40 , 'Video Games' );
+
+INSERT INTO Products ( Name , Description , Price , StockQuantity , Category)
+VALUES ( 'iPhone 16 Pro' , 'Smart phone' , 4944 , 90 , 'Phones' );
+
+INSERT INTO Products ( Name , Description , Price , StockQuantity , Category)
+VALUES ( 'Samsung 55-Inch Smart TV' , 'UHD 4K Smart TV, 60 Hz' , 1199 , 25 , 'Electronics' );
+
+INSERT INTO Products ( Name , Description , Price , StockQuantity , Category)
+VALUES ( 'Navy Dress' , 'Long gradient dress' , 320 , 10 , 'Womens Fashion' );
+
+INSERT INTO Products ( Name , Description , Price , StockQuantity , Category)
+VALUES ( 'Florent Watch' , 'Diamond watch' , 1200 , 30 , 'Jewelry & Accessories' );
+
+
+-- Insert into Customers table
+INSERT INTO Customers ( Name , Email , Phone , Address )
+VALUES ( 'Joury' ,'joury@gmail.com' , 0503338211 , 'Taif , Saudi Arabia' );
+
+INSERT INTO Customers ( Name , Email , Phone , Address )
+VALUES ( 'Joud' ,'joud@gmail.com' , 0504556387 , 'Jeddah , Saudi Arabia' );
+
+INSERT INTO Customers ( Name , Email , Phone , Address )
+VALUES ( 'Sara' ,'sara@hotmail.com', 0552298471 , 'Jeddah , Saudi Arabia' );
+INSERT INTO Customers ( Name , Email , Phone , Address )
+VALUES ( 'Reem' ,'reem@hotmail.com', 0552863654 , 'Taif , Saudi Arabia' );
+
+INSERT INTO Customers ( Name , Email , Phone , Address )
+VALUES ( 'Lamar' ,'lamar@gmail.com' , 0501182237 , 'Riyadh , Saudi Arabia' );
+
+
+
+-- Insert into Orders table
+-- we avoided inserting the total amount and set it to null instead so we can automatically calculate it later
+INSERT INTO Orders ( OrderDate , CustomerID )  
+VALUES ( '2025-6-8' , 1);
+
+INSERT INTO Orders ( OrderDate , CustomerID )
+VALUES ( '2025-6-04' , 2);
+
+INSERT INTO Orders ( OrderDate , CustomerID )
+VALUES ( '2025-6-13' , 3);
+
+INSERT INTO Orders ( OrderDate , CustomerID )
+VALUES ( '2025-6-14' , 4);
+
+INSERT INTO Orders ( OrderDate , CustomerID )
+VALUES ( '2025-5-10' , 4);
+
+
+-- Insert into OrderItems table
+INSERT INTO OrderItems ( Quantity , UnitPrice , ProductID , OrderID )
+VALUES ( 1 , 4944 , 2 , 1 ),  
+       ( 2 , 1670 , 1 , 2 ),
+       ( 1 , 1199  , 3 , 3 ),
+       ( 3 , 1200 , 5 , 4 ),
+       ( 4 , 320 , 4 , 5 );
+       
+
+-- we used this statement to automatically calculate the total amount of each order for each individual customer because we can't always know the price/quantity 
+UPDATE Orders SET TotalAmount = ( SELECT SUM(UnitPrice * Quantity) FROM OrderItems WHERE OrderItems.OrderID = Orders.OrderID );
+
+
+-- Insert into Payments table
+INSERT INTO Payments ( PaymentDate , PaymentMethod , PaymentStatus , OrderID )
+VALUES ( '2025-6-8' , 'Credit card' , 'Card declined' , 1 );
+
+INSERT INTO Payments ( PaymentDate, PaymentMethod, PaymentStatus , OrderID )
+VALUES ( '2025-6-04' , 'Debit card' , 'In progress' , 2 );
+
+INSERT INTO Payments ( PaymentDate, PaymentMethod , PaymentStatus , OrderID )
+VALUES ( '2025-6-13' , 'Visa' , 'Paid' , 3 );
+
+INSERT INTO Payments ( PaymentDate, PaymentMethod , PaymentStatus , OrderID )
+VALUES ( '2025-6-14' , 'Paypal' , 'Paid' , 4 );
+
+INSERT INTO Payments ( PaymentDate , PaymentMethod , PaymentStatus , OrderID )
+VALUES ( '2025-5-05' , 'Mastercard' , 'Paid' , 5 );
+
+
+-- Insert into Shipments table
+INSERT INTO Shipments ( ShipmentDate , ShippingAddress , ShippingStatus  , OrderID ) 
+VALUES ( '2025-6-10' , 'Taif, Al Hadaiq Road, Flamoir Hotel, Room 108' , 'Pending payment to ship' , 1 );
+
+INSERT INTO Shipments ( ShipmentDate , ShippingAddress , ShippingStatus  , OrderID ) 
+VALUES ( '2025-6-8' , 'Jeddah, Madinah Road, Marriott Hotel, Room 110' , 'Out for delivery' , 2 );
+
+INSERT INTO Shipments ( ShipmentDate , ShippingAddress , ShippingStatus  , OrderID ) 
+VALUES ( '2025-6-15' , 'Jeddah, North Corniche Road, Hilton Hotel, Room 205' , 'In transit' , 3 );
+
+INSERT INTO Shipments ( ShipmentDate , ShippingAddress , ShippingStatus  , OrderID ) 
+VALUES ( '2025-6-16' , 'Taif, Airport Road, InterContinental Hotel, Room 312' , 'Left the warehouse' , 4 );
+
+INSERT INTO Shipments ( ShipmentDate , ShippingAddress , ShippingStatus  , OrderID ) 
+VALUES ( '2025-5-10' , 'Taif, Airport Road, InterContinental Hotel, Room 312' , 'Delivered' , 5 );
+
+
+-- Tables before implementing Delete/Update changes
+SELECT * FROM Customers;
+SELECT * FROM Orders;
+SELECT * FROM Products;
+SELECT * FROM OrderItems;
+SELECT * FROM Payments;
+SELECT * FROM Shipments;
+
+-- Query 1: View all products available in quantities of 30 or more
+SELECT * FROM Products WHERE StockQuantity >= 30 ;
+
+-- Query 2: Show average total amount
+SELECT AVG(TotalAmount) FROM Orders ;
+
+-- Query 3: View order details with customer information
+SELECT o.OrderID, o.OrderDate, o.TotalAmount, c.Name AS CustomerName, c.Email, c.Address
+FROM Orders o
+JOIN Customers c ON o.CustomerID = c.CustomerID;
+
+-- Query 4: Delete a customer who did not request
+DELETE FROM Customers WHERE CustomerID NOT IN (SELECT DISTINCT CustomerID FROM Orders);
+
+-- Query 5: Update Stock Quantity
+UPDATE Products SET StockQuantity = 0 WHERE ProductID = 4;
+
+-- Query 6: Updating payment status of a certain order
+UPDATE Payments SET PaymentStatus = 'Paid' WHERE OrderID = 2;
+
+-- Query 7: Delete shipments that hasn't been successfully paid for
+DELETE FROM Shipments WHERE OrderID = ( SELECT OrderID FROM Payments WHERE PaymentStatus = 'Card declined' );
+
+-- Query 8: Calculate the revenue gained only from paid orders
+SELECT SUM(TotalAmount) FROM Orders WHERE NOT OrderID = ( SELECT OrderID FROM Payments WHERE PaymentStatus = 'Card declined' );
+
+-- Query 9: View the successful payments
+SELECT * FROM Payments WHERE PaymentStatus = 'Paid';
+
+-- Query 10: View shipment status with order information
+SELECT s.ShipmentID, s.ShippingStatus, o.OrderID, o.OrderDate, o.TotalAmount
+FROM shipments s
+JOIN Orders o ON s.OrderID = o.OrderID;
+
+-- Tables after implementing Delete/Update changes
+SELECT * FROM Customers;
+SELECT * FROM Orders;
+SELECT * FROM Products;
+SELECT * FROM OrderItems;
+SELECT * FROM Payments;
+SELECT * FROM Shipments;
